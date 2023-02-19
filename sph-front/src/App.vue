@@ -13,10 +13,11 @@ export default {
   name: 'App',
   components: {
     Header, Footer
-  }
+  },
+  mounted () {
+    this.$store.dispatch('home/categoryList')
+  },
 }
 </script>
 
-<style>
-
-</style>
+<style></style>

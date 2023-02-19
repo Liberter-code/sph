@@ -3,20 +3,11 @@
 		<div class="sortList clearfix">
 			<div class="center">
 				<!--banner轮播-->
-				<div class="swiper-container" id="mySwiper">
+				<div class="swiper-container" ref="mySwiper">
 					<div class="swiper-wrapper">
-						<div class="swiper-slide">
-							<img src="./images/banner1.jpg" />
+						<div class="swiper-slide" v-for="carousel in bannerList" :key="carousel.id">
+							<img :src="carousel.imgUrl" />
 						</div>
-						<!-- <div class="swiper-slide">
-							<img src="./images/banner2.jpg" />
-						</div>
-						<div class="swiper-slide">
-							<img src="./images/banner3.jpg" />
-						</div>
-						<div class="swiper-slide">
-							<img src="./images/banner4.jpg" />
-						</div> -->
 					</div>
 					<!-- 如果需要分页器 -->
 					<div class="swiper-pagination"></div>
@@ -110,8 +101,46 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import Swiper from 'swiper'
 export default {
+	computed: {
+		...mapState('home', ['bannerList'])
+	},
+	mounted () {
+		this.$store.dispatch('home/bannerList')
+	},
+	watch: {
+		bannerList () {
+			this.$nextTick(() => {
+				var mySwiper = new Swiper(document.querySelector(".swiper-container"), {
+					loop: true,
+					pagination: {
+						el: ".swiper-pagination",
+						type: "bullets",
+						clickable: true,
+					},
+					autoplay: {
+						delay: 1000,
+						stopOnLastSlide: true,
+						disableOnInteraction: false,
+					},
+					navigation: {
+						nextEl: ".swiper-button-next",
+						prevEl: ".swiper-button-prev",
+					},
+				})
 
+				mySwiper.el.onmouseover = function () {
+					mySwiper.autoplay.stop()
+				}
+
+				mySwiper.el.onmouseout = function () {
+					mySwiper.autoplay.start()
+				}
+			})
+		},
+	}
 }
 </script>
 

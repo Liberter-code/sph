@@ -49,11 +49,14 @@ export default {
 	},
 	methods: {
 		search () {
-			this.$router.push({
+			let location = {
 				name: 'search',
 				params: { keyword: this.keyword },
-				query: { k: this.keyword.toUpperCase() }
-			})
+			}
+			if (this.$route.query) {
+				location.query = this.$route.query
+			}
+			this.$router.push(location)
 		}
 	},
 }

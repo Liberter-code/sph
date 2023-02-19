@@ -1,5 +1,6 @@
 import request from './request'
-
+import mockRequest from './mockRequest'
 export default {
-  categoryList: () => request.get('/product/getBaseCategoryList'),
+  getCategoryList: () => request.get('/product/getBaseCategoryList'),
+  getBannerList: () => mockRequest.get('/banner'),
 }

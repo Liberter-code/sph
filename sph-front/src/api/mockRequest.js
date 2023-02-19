@@ -3,7 +3,7 @@ import axios from 'axios'
 import nProgress from 'nprogress'
 
 const instance = axios.create({
-  baseURL: '/api',
+  baseURL: '/mock',
   timeout: 5000,
 })
 
