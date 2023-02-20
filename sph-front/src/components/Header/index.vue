@@ -56,6 +56,7 @@ export default {
 			if (this.$route.query) {
 				location.query = this.$route.query
 			}
+      // console.log(location)
 			this.$router.push(location)
 		}
 	},
