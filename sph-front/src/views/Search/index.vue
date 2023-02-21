@@ -14,37 +14,31 @@
             <li class="with-x" v-show="searchParams.categoryName">
               {{ searchParams.categoryName }}<i @click="removeCategoryName">×</i>
             </li>
-<!--            <li class="with-x">iphone<i>×</i></li>
-            <li class="with-x">华为<i>×</i></li>
-            <li class="with-x">OPPO<i>×</i></li>-->
+            <li class="with-x" v-show="searchParams.keyword">
+              {{ searchParams.keyword }}<i @click="removeKeyword">×</i>
+            </li>
+            <li class="with-x" v-show="searchParams.trademark">
+              {{ searchParams.trademark?.split(':')[1] }}<i @click="removeTrademark">×</i>
+            </li>
+            <li class="with-x" v-for="(p,index) in searchParams.props" :key="p">
+              {{ p.split(':')[1] }}<i @click="removeAttr(index)">×</i>
+            </li>
           </ul>
         </div>
 
         <!--selector-->
-        <SearchSelector />
+        <SearchSelector @getTrademark="getTrademark" @getAttrs="getAttrs" />
 
         <!--details-->
         <div class="details clearfix">
           <div class="sui-navbar">
             <div class="navbar-inner filter">
               <ul class="sui-nav">
-                <li class="active">
-                  <a href="#">综合</a>
+                <li :class="{active: isSynthesize}" @click="changeOrder(1)">
+                  <a>综合<span v-show="isSynthesize">{{ arrow }}</span></a>
                 </li>
-                <li>
-                  <a href="#">销量</a>
-                </li>
-                <li>
-                  <a href="#">新品</a>
-                </li>
-                <li>
-                  <a href="#">评价</a>
-                </li>
-                <li>
-                  <a href="#">价格⬆</a>
-                </li>
-                <li>
-                  <a href="#">价格⬇</a>
+                <li :class="{active: isPrice}" @click="changeOrder(2)">
+                  <a>价格 <span v-show="isPrice">{{ arrow }}</span></a>
                 </li>
               </ul>
             </div>
@@ -133,7 +127,7 @@ export default {
         category3Id: '',
         categoryName: '',
         keyword: '',
-        order: '',
+        order: '1:desc',
         pageNo: 1,
         pageSize: 10,
         props: [],
@@ -142,30 +136,77 @@ export default {
     }
   },
   computed: {
-    ...mapGetters('search', ['goodsList'])
+    ...mapGetters('search', ['goodsList']),
+    isSynthesize() {
+      return this.searchParams.order.includes('1')
+    },
+    isPrice() {
+      return this.searchParams.order.includes('2')
+    },
+    order() {
+      return this.searchParams.order.includes('asc')
+    },
+    arrow() {
+      return this.order ? '⬆' : '⬇'
+    }
   },
   methods: {
     getData() {
-      Object.assign(this.searchParams, this.$route.query, this.$route.params)
       this.$store.dispatch('search/searchList', this.searchParams)
-      this.searchParams.category1Id = undefined
-      this.searchParams.category2Id = undefined
-      this.searchParams.category3Id = undefined
     },
-    removeCategoryName(){
-      this.getData()
+    removeCategoryName() {
       this.searchParams.categoryName = undefined
-      this.$router.push({name: 'search', params: this.$route.params})
+      this.$router.push({ name: 'search', params: this.$route.params })
+    },
+    removeKeyword() {
+      this.searchParams.keyword = undefined
+      this.$bus.$emit('clearKeyword')
+      this.$router.push({ name: 'search', query: this.$route.query })
+    },
+    getTrademark(trademark) {
+      this.searchParams.trademark = `${ trademark.tmId }:${ trademark.tmName }`
+      this.getData()
+    },
+    removeTrademark() {
+      this.searchParams.trademark = undefined
+      this.getData()
+    },
+    getAttrs(attr) {
+      if (this.searchParams.props.indexOf(attr) !== -1) {
+        return
+      }
+      this.searchParams.props.push(attr)
+      this.getData()
+    },
+    removeAttr(index) {
+      this.searchParams.props.splice(index, 1)
+      this.getData()
+    },
+    changeOrder(type) {
+      const originOrder = this.searchParams.order
+      const originType = +originOrder.split(':')[0]
+      if (type === originType) {
+        this.searchParams.order = this.order
+            ? originOrder.replace('asc', 'desc')
+            : originOrder.replace('desc', 'asc')
+      } else {
+        this.searchParams.order = `${ type }:desc`
+      }
+      this.getData()
     }
   },
-  // beforeMount() {
-  //   Object.assign(this.searchParams, this.$route.query, this.$route.params)
-  // },
+  beforeMount() {
+    Object.assign(this.searchParams, this.$route.query, this.$route.params)
+  },
   mounted() {
     this.getData()
   },
-  watch:{
-    $route(newValue, oldValue){
+  watch: {
+    $route(newValue, oldValue) {
+      this.searchParams.category1Id = undefined
+      this.searchParams.category2Id = undefined
+      this.searchParams.category3Id = undefined
+      Object.assign(this.searchParams, this.$route.query, this.$route.params)
       this.getData()
     }
   }
@@ -503,5 +544,9 @@ export default {
       }
     }
   }
+}
+
+.asc::after {
+  content: '⬆'
 }
 </style>
