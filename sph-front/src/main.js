@@ -9,8 +9,11 @@ import 'swiper/css/swiper.css'
 
 import TypeNav from '@/components/TypeNav'
 import Carousel from '@/components/Carousel'
+import Pagination from '@/components/Pagination'
+
 Vue.component(TypeNav.name, TypeNav)
 Vue.component(Carousel.name, Carousel)
+Vue.component(Pagination.name, Pagination)
 
 Vue.config.productionTip = false
 

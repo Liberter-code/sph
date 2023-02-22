@@ -5,5 +5,6 @@ export default {
   getCategoryList: () => request.get('/product/getBaseCategoryList'),
   getBannerList: () => mockRequest.get('/banner'),
   getFloorList: () => mockRequest.get('/floor'),
-  getSearchResult: (data) => request.post('/list', data)
+  getSearchResult: (data) => request.post('/list', data),
+  getGoodInfo: (skuId) => request.get(`/item/${skuId}`),
 }
