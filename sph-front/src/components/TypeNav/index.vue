@@ -27,7 +27,7 @@
                        :key="c2.categoryId">
                     <dl class="fore">
                       <dt>
-                        <a :data-categoryName="c2.categoryName"
+                        <a :data-category-name="c2.categoryName"
                            :data-category2Id="c2.categoryId">
                           {{ c2.categoryName }}
                         </a>
@@ -35,7 +35,7 @@
                       <dd>
                         <em v-for="c3 in c2.categoryChild"
                             :key="c3.categoryId">
-                          <a :data-categoryName="c3.categoryName"
+                          <a :data-category-name="c3.categoryName"
                              :data-category3Id="c3.categoryId">
                             {{ c3.categoryName }}
                           </a>

@@ -1,6 +1,7 @@
 // 对axios进行封装
 import axios from 'axios'
 import nProgress from 'nprogress'
+import store from '@/store'
 
 const instance = axios.create({
   baseURL: '/api',
@@ -8,6 +9,9 @@ const instance = axios.create({
 })
 
 instance.interceptors.request.use((config) => {
+  if(store.state.detail.uuid_token){
+    config.headers.userTempId = store.state.detail.uuid_token
+  }
   nProgress.start()
   return config
 })

@@ -76,12 +76,12 @@
             </div>
             <div class="cartWrap">
               <div class="controls">
-                <input autocomplete="off" class="itxt">
-                <a href="javascript:" class="plus">+</a>
-                <a href="javascript:" class="mins">-</a>
+                <input autocomplete="off" class="itxt" v-model="skuNum" @change="changeSkuNum">
+                <a href="javascript:" class="plus" @click="skuNum++">+</a>
+                <a href="javascript:" class="mins" @click="skuNum > 1 && skuNum--">-</a>
               </div>
               <div class="add">
-                <a href="javascript:">加入购物车</a>
+                <a href="javascript:" @click="addToCart">加入购物车</a>
               </div>
             </div>
           </div>
@@ -335,12 +335,18 @@
 import {mapGetters} from 'vuex'
 import ImageList from './ImageList/ImageList'
 import Zoom from './Zoom/Zoom'
+import {updateShopCart} from '@/api'
 
 export default {
   name: 'Detail',
   components: {
     ImageList,
     Zoom
+  },
+  data() {
+    return {
+      skuNum: 1
+    }
   },
   computed: {
     ...mapGetters('detail', ['categoryView', 'spuSaleAttrList', 'skuInfo']),
@@ -350,10 +356,32 @@ export default {
   },
   methods: {
     changeActive(spuSaleAttrValue, spuSaleAttrValueList) {
-      spuSaleAttrValueList.forEach(item=>{
+      spuSaleAttrValueList.forEach(item => {
         item.isChecked = 0
       })
       spuSaleAttrValue.isChecked = 1
+    },
+    changeSkuNum(event) {
+      let skuNum = event.target.value
+      skuNum = Math.abs(parseInt(skuNum))
+      this.skuNum = skuNum > 0 ? skuNum : 1
+    },
+    addToCart() {
+      /*let result = await updateShopCart(this.$route.params.skuId, this.skuNum)
+      if (result.code === 200) {
+        sessionStorage.setItem('SKU_INFO', JSON.stringify(this.skuInfo))
+        await this.$router.push({ name: 'addCartSuccess', query: { skuNum: this.skuNum } })
+      }*/
+      try {
+        this.$store.dispatch('detail/updateCart', {
+          skuId: this.$route.params.skuId,
+          skuNum: this.skuNum
+        })
+        sessionStorage.setItem('SKU_INFO', JSON.stringify(this.skuInfo))
+        this.$router.push({ name: 'addCartSuccess', query: { skuNum: this.skuNum } })
+      } catch (e) {
+
+      }
     }
   },
   mounted() {

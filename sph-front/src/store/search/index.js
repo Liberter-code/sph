@@ -1,6 +1,5 @@
-import api from '@/api/index'
+import {getSearchResult} from '@/api/index'
 
-const { getSearchResult } = api
 export default {
   namespaced: true,
   state: {
@@ -15,18 +14,18 @@ export default {
     }
   },
   mutations: {
-    SEARCH_LIST(state,searchList){
+    SEARCH_LIST(state, searchList) {
       state.searchList = searchList
     }
   },
   getters: {
-    attrsList(state){
+    attrsList(state) {
       return state.searchList.attrsList || []
     },
-    goodsList(state){
+    goodsList(state) {
       return state.searchList.goodsList || []
     },
-    trademarkList(state){
+    trademarkList(state) {
       return state.searchList.trademarkList || []
     }
   }

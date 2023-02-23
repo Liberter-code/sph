@@ -1,6 +1,5 @@
-import api from '@/api'
-const { getCategoryList,getBannerList,getFloorList } = api
-// console.log(api)
+import { getCategoryList,getBannerList,getFloorList } from '@/api'
+
 export default {
   namespaced: true,
   state: {
