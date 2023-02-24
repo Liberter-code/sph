@@ -28,10 +28,18 @@ export default {
         return Promise.reject()
       }
     },
-    deleteChecked({dispatch,getters}){
+    deleteChecked({ dispatch, getters }) {
       const promises = []
-      getters.cartList.forEach(item=>{
+      getters.cartList.forEach(item => {
         let promise = item.isChecked == 1 ? dispatch('deleteGood', item.skuId) : ''
+        promises.push(promise)
+      })
+      return Promise.all(promises)
+    },
+    checkedAll({ dispatch, getters }, isChecked) {
+      const promises = []
+      getters.cartList.forEach(item => {
+        let promise = item.isChecked == isChecked ? '' : dispatch('updateCheckCart', { skuId: item.skuId, isChecked })
         promises.push(promise)
       })
       return Promise.all(promises)
