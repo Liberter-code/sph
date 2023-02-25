@@ -5,8 +5,27 @@ import Login from '@/views/Login/index.vue'
 import Register from '@/views/Register/index.vue'
 import AddCartSuccess from '@/views/AddCartSuccess/index.vue'
 import ShopCart from '@/views/ShopCart/index.vue'
-
+import Trade from "@/views/Trade/index.vue";
+import Pay from '@/views/Pay/index.vue'
+import PaySuccess from '@/views/PaySuccess/index.vue'
+import Center from '@/views/Center/index.vue'
 export default [
+  {
+    path: '/center',
+    component: Center
+  },
+  {
+    path: '/paySuccess',
+    component: PaySuccess
+  },
+  {
+    path: '/pay',
+    component: Pay
+  },
+  {
+    path: '/trade',
+    component: Trade
+  },
   {
     path: '/cart',
     name: 'cart',
