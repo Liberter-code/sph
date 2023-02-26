@@ -78,9 +78,9 @@
       <div class="price">应付金额:　<span>¥{{ orderInfo.totalAmount }}.00</span></div>
       <div class="receiveInfo">
         寄送至:
-        <span>{{ defaultAddress.fullAddress }}</span>
-        收货人：<span>{{ defaultAddress.consignee }}</span>
-        <span>-{{ defaultAddress.phoneNum }}</span>
+        <span>{{ defaultAddress?.fullAddress }}</span>
+        收货人：<span>{{ defaultAddress?.consignee }}</span>
+        <span>-{{ defaultAddress?.phoneNum }}</span>
       </div>
     </div>
     <div class="sub clearFix">

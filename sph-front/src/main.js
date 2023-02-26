@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import VueLazyload from 'vue-lazyload'
 import App from './App.vue'
 import router from './router'
 import store from './store'
@@ -21,6 +22,17 @@ Vue.prototype.$msgbox = MessageBox
 Vue.prototype.$alert = MessageBox.alert
 Vue.config.productionTip = false
 
+import atm from '@/assets/images/1.gif'
+Vue.use(VueLazyload,{
+  loading: atm
+})
+
+import myPlugins from '@/plugins/myPlugins'
+Vue.use(myPlugins,{
+  name: 'upper'
+})
+
+import '@/plugins/validate'
 new Vue({
   render: (h) => h(App),
   beforeCreate() {
