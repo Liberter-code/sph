@@ -91,13 +91,15 @@
 <script>
 import { mapState } from 'vuex'
 export default {
+	name: 'ListContainer',
 	computed: {
 		...mapState('home', ['bannerList'])
 	},
 	mounted () {
 		this.$store.dispatch('home/bannerList')
+		console.log('你的名字是:${}');
 	},
-	
+
 }
 </script>
 
