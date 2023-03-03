@@ -1,13 +1,10 @@
 <template>
-  <div>
-    <el-card />
-    <el-card />
-  </div>
+  <div />
 </template>
 
 <script>
 export default {
-  name: 'Attr'
+  name: 'CategorySelect'
 }
 </script>
 

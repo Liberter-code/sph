@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-button type="primary" icon="el-icon-plus" size="small" @click="showDialog">添加</el-button>
+    <el-button type="primary" icon="el-icon-plus" size="small" @click="showDialog()">添加</el-button>
     <el-table border style="margin-top: 20px;" :data="list">
       <el-table-column type="index" label="序号" width="80px" align="center" />
       <el-table-column prop="tmName" label="品牌名称" align="center" />
@@ -9,10 +9,10 @@
           <img :src="row.logoUrl" alt="" style="width: 50px;height: 50px;">
         </template>
       </el-table-column>
-      <el-table-column prop="prop" label="操作" align="center">
-        <template v-slot>
-          <el-button type="primary" size="mini" @click="showDialog">修改</el-button>
-          <el-button type="danger" size="mini">删除</el-button>
+      <el-table-column label="操作" align="center">
+        <template v-slot="{ row }">
+          <el-button type="primary" size="mini" @click="showDialog(row)">修改</el-button>
+          <el-button type="danger" size="mini" @click="deleteTrademark(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -28,12 +28,12 @@
       @current-change="getPageList"
       @size-change="handlerChangeSize"
     />
-    <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
-      <el-form :model="trademark" style="width: 80%;">
-        <el-form-item label="品牌名称" label-width="100px">
+    <el-dialog :title="title" :visible.sync="dialogFormVisible">
+      <el-form ref="trademark-form" :model="trademark" :rules="rules" style="width: 80%;">
+        <el-form-item prop="tmName" label="品牌名称" label-width="100px" required>
           <el-input v-model="trademark.tmName" autocomplete="off" />
         </el-form-item>
-        <el-form-item label="品牌LOGO" label-width="100px">
+        <el-form-item prop="logoUrl" label="品牌LOGO" label-width="100px" required>
           <el-upload
             class="avatar-uploader"
             action="/dev-api/admin/product/fileUpload"
@@ -48,8 +48,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="handlerSubmit">确 定</el-button>
+        <el-button @click="closeDialog('trademark-form')">取 消</el-button>
+        <el-button type="primary" @click="handlerSubmit('trademark-form')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -70,7 +70,17 @@ export default {
         tmName: '',
         logoUrl: ''
       },
-      formLabelWidth: '120px'
+      formLabelWidth: '120px',
+      title: '',
+      rules: {
+        tmName: [
+          { required: true, message: '请输入品牌名称', trigger: 'blur' },
+          { min: 2, max: 10, message: '长度在 2 到 10 个字符', trigger: 'change' }
+        ],
+        logoUrl: [
+          { required: true, message: '请选择品牌图片' }
+        ]
+      }
     }
   },
   mounted() {
@@ -89,9 +99,14 @@ export default {
       this.pageSize = limit
       this.getPageList()
     },
-    showDialog() {
-      this.trademark = { tmName: '', logoUrl: '' }
+    showDialog(row) {
+      this.title = row ? '修改品牌' : '新增品牌'
+      this.trademark = { ...row } || { tmName: '', logoUrl: '' }
       this.dialogFormVisible = true
+    },
+    closeDialog(formName) {
+      this.$refs[formName].resetFields()
+      this.dialogFormVisible = false
     },
     handleAvatarSuccess(res) {
       this.trademark.logoUrl = res.data
@@ -108,14 +123,42 @@ export default {
       }
       return isJPG && isLt2M
     },
-    async handlerSubmit() {
-      this.dialogFormVisible = false
-      const result = await this.$API.trademark.addTrademark(this.trademark)
-      if (result.code === 200) {
-        await this.getPageList(this.currentPage)
-        this.$message.success('添加成功')
-      } else {
-        this.$message.error('添加失败')
+    handlerSubmit(formName) {
+      this.$refs[formName].validate(async(valid) => {
+        if (valid) {
+          this.dialogFormVisible = false
+          try {
+            const result = this.title === '新增品牌'
+              ? await this.$API.trademark.addTrademark(this.trademark)
+              : await this.$API.trademark.updateTrademark(this.trademark)
+            if (result.code === 200) {
+              await this.getPageList(this.currentPage)
+              this.$message.success(this.trademark.id ? '修改成功' : '添加成功')
+            }
+          } catch (e) {
+            this.$message.error(e.message)
+          } finally {
+            this.title = ''
+          }
+        } else {
+          return false
+        }
+      })
+    },
+    async deleteTrademark(row) {
+      try {
+        await this.$confirm(`你确定删除${row.tmName}?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+        const result = await this.$API.trademark.deleteTrademark(row.id)
+        if (result.code === 200) {
+          this.$message.success('删除成功!')
+          this.getPageList(this.list.length > 1 ? this.currentPage : this.currentPage - 1)
+        }
+      } catch (e) {
+        this.$message.info('已取消删除')
       }
     }
   }
