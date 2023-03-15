@@ -5,7 +5,8 @@
     </el-card>
     <el-card>
       <div v-show="showTable">
-        <el-button type="primary" icon="el-icon-plus" :disabled="!haveCategory3Id" @click="addAttr">添加属性
+        <el-button type="primary" icon="el-icon-plus" :disabled="!haveCategory3Id" @click="addAttr">
+          添加属性
         </el-button>
         <el-table style="width: 100%;margin-top: 15px;" border :data="attrList">
           <el-table-column type="index" label="序号" width="80" align="center" />
@@ -45,9 +46,18 @@
         <el-button @click="showTable = true">取消</el-button>
         <el-table style="width: 100%;margin: 20px 0;" border :data="attrInfo.attrValueList">
           <el-table-column type="index" align="center" label="序号" width="80" />
-          <el-table-column prop="valueName" align="center" label="属性值名称" width="width">
-            <template v-slot="{ row }">
-              <el-input v-model="row.valueName" size="mini" />
+          <el-table-column prop="valueName" align="left" label="属性值名称" width="width">
+            <template v-slot="{ row,index }">
+              <el-input
+                v-if="row.isEdit"
+                ref="attrInput"
+                v-model="row.valueName"
+                placeholder="请输入属性值"
+                size="mini"
+                @blur="toDisplay(row, index)"
+                @keyup.native.enter="toDisplay(row, index)"
+              />
+              <div v-else style="height: 1rem;width: 100%;" @click="toEdit(row, index)">{{ row.valueName }}</div>
             </template>
           </el-table-column>
           <el-table-column prop="prop" align="center" label="操作" width="width">
@@ -73,6 +83,8 @@ export default {
       showTable: true,
       categoryLevel: {},
       attrList: [],
+      isReap: false,
+      showInput: true,
       attrInfo: {
         attrName: '',
         attrValueList: [],
@@ -109,11 +121,56 @@ export default {
       }
     },
     addAttrValue() {
-      this.attrInfo.attrValueList.push({ attrId: undefined, valueName: '' })
+      if (this.isReap) {
+        return
+      }
+      this.attrInfo.attrValueList.push({ attrId: this.attrInfo.id, valueName: '', isEdit: true })
+      this.$nextTick(() => {
+        this.$refs.attrInput.focus()
+      })
+    },
+    toEdit(row) {
+      if (this.isReap) {
+        this.$message.warning('该属性已存在')
+        this.$nextTick(() => {
+          this.$refs.attrInput.focus()
+        })
+        return
+      }
+      row.isEdit = true
+      this.$nextTick(() => {
+        this.$refs.attrInput.focus()
+      })
+    },
+    toDisplay(row) {
+      if (row.valueName.trim() === '') {
+        this.$message.warning('输入不能为空')
+        this.$nextTick(() => {
+          this.$refs.attrInput.focus()
+        })
+        this.isReap = true
+        return
+      }
+      this.isReap = this.attrInfo.attrValueList.some((item) => {
+        if (row !== item) {
+          return row.valueName === item.valueName
+        }
+      })
+      if (this.isReap) {
+        this.$message.warning('该属性已存在')
+        this.$nextTick(() => {
+          this.$refs.attrInput.focus()
+        })
+        return
+      }
+      row.isEdit = false
     },
     updateAttrInfo(attrInfo) {
-      this.attrInfo = cloneDeep(attrInfo)
       this.showTable = false
+      this.attrInfo = cloneDeep(attrInfo)
+      this.attrInfo.attrValueList.forEach(item => {
+        this.$set(item, 'isEdit', false)
+      })
     }
   }
 }
