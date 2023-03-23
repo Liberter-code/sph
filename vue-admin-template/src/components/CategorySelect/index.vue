@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form :inline="true" :model="categoryForm" class="demo-form-inline">
+    <el-form :inline="true" :model="categoryForm" class="demo-form-inline" :disabled="disabled">
       <el-form-item label="一级分类">
         <el-select v-model="categoryForm.category1Id" placeholder="请选择" @change="getCategory2List">
           <el-option
@@ -37,6 +37,7 @@
 <script>
 export default {
   name: 'CategorySelect',
+  props: ['disabled'],
   data() {
     return {
       categoryForm: {
