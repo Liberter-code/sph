@@ -39,7 +39,10 @@ import API from '@/api'
 
 Vue.prototype.$API = API
 import CategorySelect from '@/components/CategorySelect/index.vue'
+import HintButton from '@/components/HintButton/index.vue'
+
 Vue.component(CategorySelect.name, CategorySelect)
+Vue.component(HintButton.name, HintButton)
 new Vue({
   el: '#app',
   router,

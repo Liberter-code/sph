@@ -1,25 +1,15 @@
 <template>
   <div>
     <el-card>
-      <CategorySelect @getCategoryId="getCategoryId" :disabled="!showTable" />
+      <CategorySelect :disabled="!showTable" @getCategoryId="getCategoryId" />
     </el-card>
     <el-card>
       <div v-show="showTable">
-        <el-button
-          type="primary"
-          icon="el-icon-plus"
-          :disabled="!haveCategory3Id"
-          @click="addAttr"
-        >
+        <el-button type="primary" icon="el-icon-plus" :disabled="!haveCategory3Id" @click="addAttr">
           添加属性
         </el-button>
         <el-table style="width: 100%; margin-top: 15px" border :data="attrList">
-          <el-table-column
-            type="index"
-            label="序号"
-            width="80"
-            align="center"
-          />
+          <el-table-column type="index" label="序号" width="80" align="center" />
           <el-table-column prop="attrName" label="属性名称" width="150" />
           <el-table-column prop="prop" label="属性值列表" width="auto">
             <template v-slot="{ row }">
@@ -122,8 +112,8 @@
         </el-table>
         <el-button
           type="primary"
-          @click="saveAttr"
           :disabled="attrInfo.attrValueList.length < 1"
+          @click="saveAttr"
         >保存
         </el-button>
         <el-button @click="showTable = true">取消</el-button>
@@ -137,7 +127,7 @@ import cloneDeep from 'lodash/cloneDeep'
 
 export default {
   name: 'Attr',
-  data () {
+  data() {
     return {
       showTable: true,
       categoryLevel: {},
@@ -153,7 +143,7 @@ export default {
     }
   },
   computed: {
-    haveCategory3Id () {
+    haveCategory3Id() {
       return (
         this.categoryLevel.category3Id !== undefined &&
         this.categoryLevel.category3Id !== ''
@@ -161,22 +151,22 @@ export default {
     }
   },
   methods: {
-    deleteAttr (index) {
+    deleteAttr(index) {
       this.attrInfo.attrValueList.splice(index, 1)
     },
-    getCategoryId (categoryIds) {
+    getCategoryId(categoryIds) {
       this.categoryLevel = categoryIds
-      if ( this.haveCategory3Id ) {
+      if (this.haveCategory3Id) {
         this.getAttrList()
       }
     },
-    async getAttrList () {
+    async getAttrList() {
       const result = await this.$API.attr.attrList(this.categoryLevel)
-      if ( result.code === 200 ) {
+      if (result.code === 200) {
         this.attrList = result.data
       }
     },
-    addAttr () {
+    addAttr() {
       this.showTable = false
       this.attrInfo = {
         attrName: '',
@@ -185,8 +175,8 @@ export default {
         categoryLevel: 3
       }
     },
-    addAttrValue () {
-      if ( this.isReap ) {
+    addAttrValue() {
+      if (this.isReap) {
         return
       }
       this.attrInfo.attrValueList.push({
@@ -198,8 +188,8 @@ export default {
         this.$refs.attrInput.focus()
       })
     },
-    toEdit (row) {
-      if ( this.isReap ) {
+    toEdit(row) {
+      if (this.isReap) {
         this.$message.warning('该属性已存在')
         this.$nextTick(() => {
           this.$refs.attrInput.focus()
@@ -211,8 +201,8 @@ export default {
         this.$refs.attrInput.focus()
       })
     },
-    toDisplay (row) {
-      if ( row.valueName.trim() === '' ) {
+    toDisplay(row) {
+      if (row.valueName.trim() === '') {
         this.$message.warning('输入不能为空')
         this.$nextTick(() => {
           this.$refs.attrInput.focus()
@@ -221,11 +211,11 @@ export default {
         return
       }
       this.isReap = this.attrInfo.attrValueList.some((item) => {
-        if ( row !== item ) {
+        if (row !== item) {
           return row.valueName === item.valueName
         }
       })
-      if ( this.isReap ) {
+      if (this.isReap) {
         this.$message.warning('该属性已存在')
         this.$nextTick(() => {
           this.$refs.attrInput.focus()
@@ -234,17 +224,17 @@ export default {
       }
       row.isEdit = false
     },
-    updateAttrInfo (attrInfo) {
+    updateAttrInfo(attrInfo) {
       this.showTable = false
       this.attrInfo = cloneDeep(attrInfo)
       this.attrInfo.attrValueList.forEach((item) => {
         this.$set(item, 'isEdit', false)
       })
     },
-    async saveAttr () {
+    async saveAttr() {
       try {
         const res = await this.$API.attr.saveAttrInfo(this.attrInfo)
-        if ( res.code === 200 ) {
+        if (res.code === 200) {
           this.$message.success('保存成功!')
           this.getAttrList()
           this.showTable = true

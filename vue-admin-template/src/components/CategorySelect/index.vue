@@ -37,7 +37,11 @@
 <script>
 export default {
   name: 'CategorySelect',
-  props: ['disabled'],
+  props: {
+    disabled: {
+      type: Boolean
+    }
+  },
   data() {
     return {
       categoryForm: {
